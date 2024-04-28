@@ -275,10 +275,46 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
                 albumNames.add(album.getName());
             }
         }
-
+        if(albumNames.size() == 0) {
+            Toast.makeText(this, "No other albums.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+// Convert the list to an array for the AlertDialog dropdown
+        String[] albumArray = albumNames.toArray(new String[0]);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Move to:");
+
+        builder.setItems(albumArray, (dialog, which) -> {
+            // Get the selected album
+            String selectedAlbumName = albumArray[which];
+
+            // Find the album object from the selected album name
+            Album albumTo = null;
+            for (Album album : Album.albumsList) {
+                if (album.getName().equals(selectedAlbumName)) {
+                    albumTo = album;
+                    break;
+                }
+            }
+
+            if (albumTo != null) {
+                // Move the photo to the selected album
+                Photo selectedPhoto = currentAlbum.getPhotos().get(selectedPosition);
+                currentAlbum.movePhoto(selectedPhoto.getFilePath(), albumTo);
+
+                // Update UI
+                updateAlbumsList();
+                photoListAdapter.notifyDataSetChanged();
+                Toast.makeText(this, "Photo moved to " + selectedAlbumName, Toast.LENGTH_SHORT).show();
+            } else {
+                Log.e("Error", "Selected album not found");
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
 
     }
 

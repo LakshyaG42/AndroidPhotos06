@@ -27,14 +27,30 @@ public class Photo implements Serializable {
     }
 
     public void setPersonTag(String s){
-        this.personTag = s;
+        if(s.isEmpty()) {
+            deletePersonTag();
+        } else {
+            this.personTag = s;
+        }
+    }
+
+    public String getPerson() {
+        return this.personTag;
+    }
+    public String getLocation() {
+        return this.locationTag;
     }
     public void deletePersonTag() {
         this.personTag = null;
     }
 
     public void setLocationTag(String s){
-        this.locationTag = s;
+        if(s.isEmpty()) {
+            deleteLocationTag();
+        } else {
+            this.locationTag = s;
+        }
+
     }
 
     public void deleteLocationTag() {

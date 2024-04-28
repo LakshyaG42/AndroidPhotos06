@@ -1,12 +1,18 @@
 package com.cs213.androidphotos06;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,8 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAlbumClickListener {
+    private static final int REQUEST_STORAGE_PERMISSION = 1001;
     RecyclerView recyclerView;
     AlbumAdapter albumAdapter;
+
+    int selectedPosition = -1;
 
 
     @Override
@@ -40,21 +49,31 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
         loadAlbums();
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        displayItems();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                    REQUEST_STORAGE_PERMISSION);
+        } else {
+            displayItems();
+            albumAdapter.setOnAlbumClickListener(this);
+        }
         Button btnAddAlbum = findViewById(R.id.addAlbumButton);
         btnAddAlbum.setOnClickListener(view -> addAlbum());
         Button btnDeleteAlbum = findViewById(R.id.removeAlbumButton);
         btnDeleteAlbum.setOnClickListener(view -> deleteAlbum());
         Button btnRenameAlbum = findViewById(R.id.renameAlbumButton);
         btnRenameAlbum.setOnClickListener(view -> renameAlbum());
-
+        Button btnOpenAlbum = findViewById(R.id.openAlbumButton);
+        btnOpenAlbum.setOnClickListener(view -> openAlbum());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        albumAdapter.setOnAlbumClickListener(this);
+
     }
 
     private void addAlbum() {
@@ -65,13 +84,21 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
         final EditText input = new EditText(this);
         input.setHint("Album Name");
         builder.setView(input);
-
+        boolean dupName = false;
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String albumName = input.getText().toString().trim();
                 // Add album to the list
+                for (Album existing: Album.albumsList
+                ) {
+                    if(existing.getName().equals(albumName)) {
+                        Toast.makeText(getApplicationContext(), "Album name already exists", Toast.LENGTH_SHORT).show();
+                        addAlbum();
+                        return;
+                    }
+                }
                 if (!albumName.isEmpty()) {
                     Album newAlbum = new Album(albumName);
                     albumAdapter.notifyDataSetChanged();
@@ -90,14 +117,23 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
     }
 
     public void deleteAlbum() {
+        if(selectedPosition == -1) {
+            Toast.makeText(this, "Please select an album.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(Album.albumsList.contains(albumAdapter.getSelected())) {
             Album.deleteFromAlbumList(albumAdapter.getSelected());
             albumAdapter.notifyDataSetChanged();
             updateAlbumsList();
+            this.selectedPosition = -1;
         }
     }
 
     public void renameAlbum() {
+        if(selectedPosition == -1) {
+            Toast.makeText(this, "Please select an album.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(Album.albumsList.contains(albumAdapter.getSelected())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Enter New Album Name");
@@ -131,6 +167,8 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
         }
     }
 
+
+
     private void displayItems() {
         recyclerView = findViewById(R.id.recycler_main);
         recyclerView.setHasFixedSize(true);
@@ -140,11 +178,22 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
     }
 
     public void onAlbumClick(int position) {
-        Album selectedAlbum = Album.albumsList.get(position);
-        String albumName = selectedAlbum.getName();
+        this.selectedPosition = position;
     }
 
-
+    private void openAlbum() {
+        if(selectedPosition == -1) {
+            Toast.makeText(this, "Please select an album.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(Album.albumsList.contains(albumAdapter.getSelected())) {
+            String selectedAlbum = Album.albumsList.get(selectedPosition).getName();
+            Log.i("INFO", "Selected Album: " + selectedAlbum);
+            Intent intent = new Intent(this, AlbumViewerActivity.class);
+            intent.putExtra("selectedAlbum", selectedAlbum);
+            startActivity(intent);
+        }
+    }
     private void updateAlbumsList() {
         try {
             FileOutputStream fileOut = openFileOutput("albums.ser", Context.MODE_PRIVATE);
@@ -183,6 +232,23 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed with accessing storage
+                // Your code to access external storage goes here
+                displayItems();
+            } else {
+                // Permission denied, show a message or take appropriate action
+                // For example, you can show a message and then finish the activity
+                Toast.makeText(this, "Permission denied. Closing the app.", Toast.LENGTH_SHORT).show();
+                finish(); // Close the activity or exit the app
+            }
         }
     }
 }

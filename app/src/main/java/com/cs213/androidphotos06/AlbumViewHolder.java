@@ -15,8 +15,12 @@ public class AlbumViewHolder extends RecyclerView.ViewHolder {
         albumName = itemView.findViewById(R.id.albumName);
         itemView.setOnClickListener(view -> {
             // Toggle the background color or any other visual indicator
-            itemView.setBackgroundColor(Color.LTGRAY); // Change to default color
-
+            if (itemView.getBackground() != null) {
+                // Check if the background color is already changed
+                itemView.setBackgroundColor(Color.TRANSPARENT); // Change to default color
+            } else {
+                itemView.setBackgroundColor(Color.LTGRAY); // Change to new color
+            }
         });
 
     }

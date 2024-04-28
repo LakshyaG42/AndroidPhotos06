@@ -23,7 +23,7 @@ public class Album implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private List<Photo> photos;
+    private ArrayList<Photo> photos;
 
     static ArrayList<Album> albumsList;
 
@@ -46,17 +46,23 @@ public class Album implements Serializable {
         this.name = name;
     }
 
-    public List<Photo> getPhotos() {
+    public ArrayList<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
+    public void setPhotos(ArrayList<Photo> photos) {
         this.photos = photos;
     }
 
     // Additional methods for photo management
 
     public void addPhoto(Photo photo) {
+        for (Photo thisphoto: this.photos
+             ) {
+            if(thisphoto.getFilePath().equals(photo.getFilePath())) {
+                return;
+            }
+        }
         this.photos.add(photo);
     }
 
@@ -93,6 +99,7 @@ public class Album implements Serializable {
                 return;
             }
         }
+
     }
 
     //Android Static Methods to keep track of albums

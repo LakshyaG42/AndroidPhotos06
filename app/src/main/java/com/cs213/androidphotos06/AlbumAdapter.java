@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumViewHolder> {
     private Context context;
 
-    private int selectedPosition;
+    private int selectedPosition = -1;
     private OnAlbumClickListener clickListener;
     public AlbumAdapter(Context context) {
         this.context = context;

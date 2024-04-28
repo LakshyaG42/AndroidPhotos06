@@ -33,4 +33,60 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
+    <Button
+        android:id="@+id/addAlbumButton"
+        android:layout_width="155dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="11dp"
+        android:text="Add"
+        app:layout_constraintBottom_toTopOf="@+id/openAlbumButton"
+        app:layout_constraintEnd_toStartOf="@+id/removeAlbumButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_main" />
+
+    <Button
+        android:id="@+id/removeAlbumButton"
+        android:layout_width="155dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="11dp"
+        android:text="Remove"
+        app:layout_constraintBottom_toTopOf="@+id/renameAlbumButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addAlbumButton"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_main" />
+
+    <Button
+        android:id="@+id/openAlbumButton"
+        android:layout_width="155dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Open"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/renameAlbumButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addAlbumButton" />
+
+    <Button
+        android:id="@+id/renameAlbumButton"
+        android:layout_width="155dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="Rename"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/openAlbumButton"
+        app:layout_constraintTop_toBottomOf="@+id/removeAlbumButton" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

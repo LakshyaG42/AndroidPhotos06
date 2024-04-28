@@ -197,6 +197,7 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
              ) {
             if(photo.getFilePath().equals(selectedPhoto.getFilePath())) {
                 currentAlbum.removePhoto(selectedPhoto);
+                selectedPosition = -1;
                 break;
             }
         }
@@ -257,6 +258,7 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
 
     private void slideshow() {
         String selectedAlbum = currentAlbumName;
+        loadAlbums();
         Log.i("INFO", "Selected Album: " + selectedAlbum);
         Intent intent = new Intent(this, SlideshowActivity.class);
         intent.putExtra("selectedAlbum", selectedAlbum);
@@ -302,7 +304,12 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
                 // Move the photo to the selected album
                 Photo selectedPhoto = currentAlbum.getPhotos().get(selectedPosition);
                 currentAlbum.movePhoto(selectedPhoto.getFilePath(), albumTo);
-
+                for (Photo photo : albumTo.getPhotos()) {
+                    if (photo.getFilePath().equals(selectedPhoto.getFilePath())) {
+                        Toast.makeText(this, "Photo already exists at destination album: " + selectedAlbumName, Toast.LENGTH_SHORT).show();
+                        return;
+                        }
+                }
                 // Update UI
                 updateAlbumsList();
                 photoListAdapter.notifyDataSetChanged();

@@ -70,7 +70,7 @@ public class SlideshowActivity extends AppCompatActivity {
     }
 
     private void updateButtons(Button nextButton, Button prevButton) {
-        if(currentAlbum.getPhotos().size() > 2) {
+        if(currentAlbum.getPhotos().size() >= 2) {
             if(currentPosition > 0 && currentPosition < currentAlbum.getPhotos().size() - 1) {
                 prevButton.setEnabled(true);
                 nextButton.setEnabled(true);

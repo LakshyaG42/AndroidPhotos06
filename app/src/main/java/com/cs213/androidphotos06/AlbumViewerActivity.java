@@ -367,8 +367,9 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
             ObjectInputStream inputStream = new ObjectInputStream(fileIn);
             Album.albumsList = (ArrayList<Album>) inputStream.readObject();
             for (Album album: Album.albumsList) {
-                if(album.getName().equals(currentAlbumName))
-                currentAlbum = album;
+                if(album.getName().equals(currentAlbumName)) {
+                    currentAlbum = album;
+                }
             }
             Log.i("SAVING/LOADING", "LOADING! Photos in Album: " + currentAlbum.getPhotos().toString());
             inputStream.close();

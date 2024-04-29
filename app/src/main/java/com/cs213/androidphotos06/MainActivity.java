@@ -314,12 +314,14 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
 
         // Set up the buttons
         builder.setPositiveButton("Search", (dialog, which) -> {
-            String personTag = personInput.getText().toString().trim().toLowerCase();
-            String locationTag = locationInput.getText().toString().trim().toLowerCase();
+            String personTag = personInput.getText().toString();
+            if(personTag != null) {personTag = personTag.trim().toLowerCase();}
+            String locationTag = locationInput.getText().toString();
+            if(locationTag != null) {locationTag = locationTag.trim().toLowerCase();}
             String operation = operationSpinner.getSelectedItem().toString();
             Log.i("INFO", "Stored from Popup:" + personTag + " and " + locationTag + " and " + operation);
 
-            if((personTag.isEmpty() || locationTag.isEmpty()) && operation.equals("Conjunction")) {
+            if(((personTag == null || locationTag == null) || (personTag.isEmpty() || locationTag.isEmpty())) && operation.equals("Conjunction")) {
                 Toast.makeText(this, "To use Conjunction Search must input for both Person Tag and Location Tag.", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -343,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
         for (Album album : Album.albumsList) {
             for (Photo photo : album.getPhotos()) {
                 String tag = photo.getPerson();
-                if (!tag.isEmpty() && !personTags.contains(tag)) {
+                if (tag != null && !tag.isEmpty() && !personTags.contains(tag)) {
                     personTags.add(tag);
                 }
             }
@@ -357,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
         for (Album album : Album.albumsList) {
             for (Photo photo : album.getPhotos()) {
                 String tag = photo.getLocation();
-                if (!tag.isEmpty() && !locationTags.contains(tag)) {
+                if (tag != null && !tag.isEmpty() && !locationTags.contains(tag)) {
                     locationTags.add(tag);
                 }
             }

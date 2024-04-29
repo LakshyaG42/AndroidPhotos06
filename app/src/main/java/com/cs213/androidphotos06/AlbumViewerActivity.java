@@ -304,13 +304,14 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
             if (albumTo != null) {
                 // Move the photo to the selected album
                 Photo selectedPhoto = currentAlbum.getPhotos().get(selectedPosition);
-                currentAlbum.movePhoto(selectedPhoto.getFilePath(), albumTo);
                 for (Photo photo : albumTo.getPhotos()) {
                     if (photo.getFilePath().equals(selectedPhoto.getFilePath())) {
                         Toast.makeText(this, "Photo already exists at destination album: " + selectedAlbumName, Toast.LENGTH_SHORT).show();
                         return;
-                        }
+                    }
                 }
+                currentAlbum.movePhoto(selectedPhoto.getFilePath(), albumTo);
+
                 // Update UI
                 updateAlbumsList();
                 photoListAdapter.notifyDataSetChanged();

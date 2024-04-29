@@ -49,7 +49,7 @@ public class SearchActivity extends AppCompatActivity {
         populateSearchArray();
         String searchQuery = null;
         if(!personTag.isEmpty() && !locationTag.isEmpty()) {
-            searchQuery = "SearchType: " + operation + "\nPerson Tag: " + personTag + " Location Tag: " + locationTag;
+            searchQuery = "SearchType: " + operation + "\nPerson Tag: " + personTag + "\nLocation Tag: " + locationTag;
         } else if(!personTag.isEmpty() ) {
             searchQuery = "SearchType: " + operation + "\nPerson Tag: " + personTag;
         } else if(!locationTag.isEmpty()) {
@@ -80,8 +80,10 @@ public class SearchActivity extends AppCompatActivity {
             case "Conjunction":
                 for (Album album: Album.albumsList) {
                     for (Photo photo: album.getPhotos()) {
-                        if(photo.getPerson().toLowerCase().equals(personTag) && photo.getLocation().toLowerCase().equals(locationTag)) {
-                            searchResults.add(photo);
+                        if(photo.getPerson() != null && photo.getLocation() != null) {
+                            if(photo.getPerson().toLowerCase().equals(personTag) && photo.getLocation().toLowerCase().equals(locationTag)) {
+                                searchResults.add(photo);
+                            }
                         }
                     }
                 }
@@ -90,9 +92,17 @@ public class SearchActivity extends AppCompatActivity {
             case "Neither":
                 for (Album album: Album.albumsList) {
                     for (Photo photo: album.getPhotos()) {
-                        if(photo.getPerson().toLowerCase().equals(personTag) || photo.getLocation().toLowerCase().equals(locationTag)) {
-                            searchResults.add(photo);
+                        if(photo.getPerson() != null) {
+                            if(photo.getPerson().toLowerCase().equals(personTag)) {
+                                searchResults.add(photo);
+                            }
                         }
+                        if(photo.getLocation() != null) {
+                            if(photo.getLocation().toLowerCase().equals(locationTag)) {
+                                searchResults.add(photo);
+                            }
+                        }
+
                     }
                 }
                 break;

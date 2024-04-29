@@ -325,6 +325,8 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
 
     }
 
+
+
     private void goBack() {
         getOnBackPressedDispatcher().onBackPressed();
         finish();

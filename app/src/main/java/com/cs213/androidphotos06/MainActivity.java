@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +27,8 @@ import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -33,6 +38,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAlbumClickListener {
@@ -67,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
         btnRenameAlbum.setOnClickListener(view -> renameAlbum());
         Button btnOpenAlbum = findViewById(R.id.openAlbumButton);
         btnOpenAlbum.setOnClickListener(view -> openAlbum());
-
+        Button btnSearch = findViewById(R.id.SearchButton);
+        btnSearch.setOnClickListener(view -> searchPhotos());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -194,6 +201,11 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
             startActivity(intent);
         }
     }
+
+
+
+
+
     private void updateAlbumsList() {
         try {
             FileOutputStream fileOut = openFileOutput("albums.ser", Context.MODE_PRIVATE);
@@ -251,4 +263,106 @@ public class MainActivity extends AppCompatActivity implements AlbumAdapter.OnAl
             }
         }
     }
+
+
+
+
+    //BELOW IS SEARCHING:
+    private AutoCompleteTextView personTagInput;
+    private AutoCompleteTextView locationTagInput;
+    private Spinner operationSpinner;
+    private List<String> personTags = new ArrayList<>();
+    private List<String> locationTags = new ArrayList<>();
+
+    private void searchPhotos() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Search Photos");
+
+        // Set up the input
+        final AutoCompleteTextView personInput = new AutoCompleteTextView(this);
+        personInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        personInput.setHint("Enter person tag");
+
+        final AutoCompleteTextView locationInput = new AutoCompleteTextView(this);
+        locationInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        locationInput.setHint("Enter location tag");
+
+        // Create autocomplete lists for person and location tags
+        ArrayList<String> personTags = getPersonTags();
+        ArrayList<String> locationTags = getLocationTags();
+
+        // Set up adapter for autocomplete suggestions
+        ArrayAdapter<String> personAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, personTags);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, locationTags);
+
+        personInput.setAdapter(personAdapter);
+        locationInput.setAdapter(locationAdapter);
+
+        // Set up the operation spinner
+        Spinner operationSpinner = new Spinner(this);
+        ArrayAdapter<String> operationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Arrays.asList("Conjunction", "Disjunction", "Neither"));
+        operationSpinner.setAdapter(operationAdapter);
+
+        // Set the layout for the dialog
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(personInput);
+        layout.addView(locationInput);
+        layout.addView(operationSpinner);
+
+        builder.setView(layout);
+
+        // Set up the buttons
+        builder.setPositiveButton("Search", (dialog, which) -> {
+            String personTag = personInput.getText().toString().trim().toLowerCase();
+            String locationTag = locationInput.getText().toString().trim().toLowerCase();
+            String operation = operationSpinner.getSelectedItem().toString();
+            Log.i("INFO", "Stored from Popup:" + personTag + " and " + locationTag + " and " + operation);
+
+            if((personTag.isEmpty() || locationTag.isEmpty()) && operation.equals("Conjunction")) {
+                Toast.makeText(this, "To use Conjunction Search must input for both Person Tag and Location Tag.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("personTag", personTag);
+            intent.putExtra("locationTag", locationTag);
+            intent.putExtra("operation", operation);
+
+            startActivity(intent);
+
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    // Method to get all existing person tags from all photos in all albums
+    private ArrayList<String> getPersonTags() {
+        ArrayList<String> personTags = new ArrayList<>();
+        for (Album album : Album.albumsList) {
+            for (Photo photo : album.getPhotos()) {
+                String tag = photo.getPerson();
+                if (!tag.isEmpty() && !personTags.contains(tag)) {
+                    personTags.add(tag);
+                }
+            }
+        }
+        return personTags;
+    }
+
+    // Method to get all existing location tags from all photos in all albums
+    private ArrayList<String> getLocationTags() {
+        ArrayList<String> locationTags = new ArrayList<>();
+        for (Album album : Album.albumsList) {
+            for (Photo photo : album.getPhotos()) {
+                String tag = photo.getLocation();
+                if (!tag.isEmpty() && !locationTags.contains(tag)) {
+                    locationTags.add(tag);
+                }
+            }
+        }
+        return locationTags;
+    }
+
 }

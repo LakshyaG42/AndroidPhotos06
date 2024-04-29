@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class SearchViewHolder extends RecyclerView.ViewHolder {
     public TextView searchPhotoDescription;
-
+    public TextView searchViewHeader;
     public ImageView searchImageView;
 
 
@@ -19,5 +19,6 @@ public class SearchViewHolder extends RecyclerView.ViewHolder {
 
         searchPhotoDescription = itemView.findViewById(R.id.searchPhotoDescription);
         searchImageView = itemView.findViewById(R.id.searchImageView);
+        searchViewHeader = itemView.findViewById(R.id.SearchViewHeader);
     }
 }

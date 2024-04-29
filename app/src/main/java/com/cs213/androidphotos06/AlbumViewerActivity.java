@@ -213,6 +213,7 @@ public class AlbumViewerActivity extends AppCompatActivity implements PhotoListA
             Toast.makeText(this, "Please select a photo", Toast.LENGTH_SHORT).show();
             return;
         }
+        Toast.makeText(this, "If you would like to remove a tag, just leave the text box empty.", Toast.LENGTH_LONG).show();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Modify Tags");
 
